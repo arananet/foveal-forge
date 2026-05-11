@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTimer } from '../../lib/useTimer'
+import { playDing, playCorrect, playIncorrect } from '../../lib/sounds'
 import { RSVP_CONFIG } from './config'
 import { PASSAGES } from './passages'
 import { initRsvpSession, getMsPerWord, recordBlockResult, summarizeRsvpSession } from './session'
@@ -79,6 +80,8 @@ export default function RsvpDrill({ onComplete }: Props) {
       if (!passage) return
 
       const correct = answer === passage.correctAnswer
+      if (correct) playCorrect()
+      else playIncorrect()
       setSelectedAnswer(answer)
       setPhase('feedback')
 
@@ -106,12 +109,28 @@ export default function RsvpDrill({ onComplete }: Props) {
     return clearTimers
   }, [startBlock, clearTimers])
 
+  // Ding when the comprehension question appears
+  useEffect(() => {
+    if (phase === 'question') playDing()
+  }, [phase])
+
   const passage = PASSAGES[passageIndex % PASSAGES.length]
-  const remainingSec = Math.ceil(remainingMs / RSVP_CONFIG.durationMs * 150)
   const progressPct = Math.round((1 - remainingMs / RSVP_CONFIG.durationMs) * 100)
-  const allAnswers = passage
-    ? [passage.correctAnswer, ...passage.distractors].sort(() => Math.random() - 0.5)
-    : []
+
+  // Shuffle answers once per passage (not every render — RAF re-renders every frame).
+  const shuffledAnswers = useMemo(() => {
+    if (!passage) return []
+    const arr: string[] = [passage.correctAnswer, ...passage.distractors]
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      const tmp = arr[i]
+      arr[i] = arr[j] ?? arr[i] ?? ''
+      arr[j] = tmp ?? ''
+    }
+    return arr
+    // passageIndex drives passage identity; no need to list passage itself
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [passageIndex])
 
   return (
     <div className="flex flex-col items-center gap-6 py-8">
@@ -175,7 +194,7 @@ export default function RsvpDrill({ onComplete }: Props) {
               {passage.question}
             </p>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              {allAnswers.map((answer) => {
+              {shuffledAnswers.map((answer) => {
                 const isSelected = selectedAnswer === answer
                 const isCorrect = answer === passage.correctAnswer
                 let cls =
@@ -206,7 +225,7 @@ export default function RsvpDrill({ onComplete }: Props) {
       </div>
 
       <p className="text-xs text-slate-400">
-        Block {sessionState.blocks.length + 1} · {remainingSec}s remaining
+        Block {sessionState.blocks.length + 1} · {Math.ceil(remainingMs / 1000)}s remaining
       </p>
     </div>
   )

@@ -1,5 +1,6 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useTimer } from '../../lib/useTimer'
+import { playTick, playFinalTick } from '../../lib/sounds'
 import { FIXATION_CONFIG } from './config'
 
 interface Props {
@@ -9,6 +10,16 @@ interface Props {
 export default function FixationDrill({ onComplete }: Props) {
   const handleExpire = useCallback(() => onComplete(), [onComplete])
   const { remainingSeconds } = useTimer(FIXATION_CONFIG.durationMs, handleExpire)
+
+  // Countdown ticks for last 10 seconds
+  useEffect(() => {
+    if (remainingSeconds <= 0) return
+    if (remainingSeconds === 1) {
+      playFinalTick()
+    } else if (remainingSeconds <= 10) {
+      playTick()
+    }
+  }, [remainingSeconds])
 
   return (
     <div className="flex flex-col items-center gap-8 py-12">
