@@ -16,31 +16,34 @@ const links: NavItem[] = [
 
 export default function Nav() {
   return (
-    <nav
-      aria-label="Main navigation"
-      className="border-b border-neutral-200 bg-white px-4"
-    >
-      <ul className="mx-auto flex max-w-2xl gap-1" role="list">
-        {links.map(({ to, label, end }) => (
-          <li key={to}>
-            <NavLink
-              to={to}
-              end={end ?? false}
-              className={({ isActive }) =>
-                [
-                  'inline-block min-h-[48px] px-3 py-3 text-sm font-medium leading-none transition-colors',
-                  'focus-visible:rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
-                  isActive
-                    ? 'border-b-2 border-neutral-900 text-neutral-900'
-                    : 'text-neutral-500 hover:text-neutral-900',
-                ].join(' ')
-              }
-            >
-              {label}
-            </NavLink>
-          </li>
-        ))}
-      </ul>
-    </nav>
+    <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/90 backdrop-blur-sm">
+      <div className="mx-auto flex max-w-3xl items-center justify-between px-4">
+        <span className="py-3 text-sm font-semibold tracking-tight text-indigo-700">
+          Foveal Forge
+        </span>
+        <nav aria-label="Main navigation">
+          <ul className="flex gap-0.5" role="list">
+            {links.map(({ to, label, end }) => (
+              <li key={to}>
+                <NavLink
+                  to={to}
+                  end={end ?? false}
+                  className={({ isActive }) =>
+                    [
+                      'inline-flex min-h-[48px] items-center px-3 text-sm font-medium transition-colors',
+                      isActive
+                        ? 'text-indigo-700 underline underline-offset-4 decoration-indigo-400'
+                        : 'text-slate-500 hover:text-slate-900',
+                    ].join(' ')
+                  }
+                >
+                  {label}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+    </header>
   )
 }

@@ -50,3 +50,22 @@ export function staircase3Down1Up(
 
   return { nextLevel, terminate: false }
 }
+
+/**
+ * Critical crowding spacing in degrees.
+ * Bouma's law: critical spacing ≈ 0.5 × eccentricity.
+ * Minimum 0.1° for foveal presentation.
+ */
+export function criticalCrowdingSpacingDeg(eccentricityDeg: number): number {
+  return Math.max(0.1, 0.5 * eccentricityDeg)
+}
+
+/**
+ * Adaptive RSVP rate after one comprehension question.
+ * Per SKILL.md: +5% on correct, −10% on failure.
+ * Clamped to [80, 600] WPM.
+ */
+export function adaptRsvpWpm(currentWpm: number, correct: boolean): number {
+  const next = correct ? currentWpm * 1.05 : currentWpm * 0.9
+  return Math.min(600, Math.max(80, Math.round(next)))
+}

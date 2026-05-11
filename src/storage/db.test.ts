@@ -1,28 +1,36 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import 'fake-indexeddb/auto'
 import { IDBFactory } from 'fake-indexeddb'
-import { putSession, getSession, listSessions, _resetDbForTesting } from './db'
-import type { Session } from '../lib/types'
+import { putSession, getSession, listSessions, putBaseline, getBaseline, _resetDbForTesting } from './db'
+import type { SessionResult, BaselineData } from '../lib/types'
 
-function makeSession(id: string, startedAt: number): Session {
+function makeSession(id: string, startedAt: number): SessionResult {
   return {
     id,
     startedAt,
     completedAt: null,
     protocolVersion: '0.1.0',
-    drillId: 'd2-gabor',
-    trials: [],
     eyeStrainScore: null,
   }
 }
 
+function makeBaseline(): BaselineData {
+  return {
+    completedAt: 1000,
+    age: 52,
+    correction: 'glasses',
+    knownConditions: '',
+    contrastThreshold: 0.15,
+    readingSpeedWpm: 180,
+  }
+}
+
 beforeEach(() => {
-  // Give each test a fresh IDB instance and clear the cached connection.
   globalThis.indexedDB = new IDBFactory()
   _resetDbForTesting()
 })
 
-describe('db', () => {
+describe('sessions', () => {
   it('putSession and getSession round-trip', async () => {
     const session = makeSession('abc', Date.now())
     await putSession(session)
@@ -49,10 +57,31 @@ describe('db', () => {
   it('putSession overwrites existing session', async () => {
     const original = makeSession('x', 1000)
     await putSession(original)
-    const updated: Session = { ...original, completedAt: 9999, eyeStrainScore: 3 }
+    const updated: SessionResult = { ...original, completedAt: 9999, eyeStrainScore: 3 }
     await putSession(updated)
     const retrieved = await getSession('x')
     expect(retrieved?.completedAt).toBe(9999)
     expect(retrieved?.eyeStrainScore).toBe(3)
+  })
+})
+
+describe('baseline', () => {
+  it('returns undefined before baseline is set', async () => {
+    expect(await getBaseline()).toBeUndefined()
+  })
+
+  it('putBaseline and getBaseline round-trip', async () => {
+    const data = makeBaseline()
+    await putBaseline(data)
+    expect(await getBaseline()).toEqual(data)
+  })
+
+  it('putBaseline overwrites previous baseline', async () => {
+    await putBaseline(makeBaseline())
+    const updated: BaselineData = { ...makeBaseline(), age: 60, readingSpeedWpm: 220 }
+    await putBaseline(updated)
+    const retrieved = await getBaseline()
+    expect(retrieved?.age).toBe(60)
+    expect(retrieved?.readingSpeedWpm).toBe(220)
   })
 })
