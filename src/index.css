@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+  --font-size-base: 18px;
+  --color-primary-bg: var(--color-neutral-50);
+  --color-primary-text: var(--color-neutral-900);
+}
+
+@layer base {
+  :focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  html {
+    font-size: var(--font-size-base);
+  }
+
+  body {
+    @apply bg-neutral-50 text-neutral-900;
+    -webkit-font-smoothing: antialiased;
+  }
+}

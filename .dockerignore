@@ -1,0 +1,35 @@
+# Dependencies — reinstalled inside the image
+node_modules
+
+# Build output — produced inside the image
+dist
+
+# Git and CI
+.git
+.github
+.gitignore
+
+# Editor
+.vscode
+.idea
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test artefacts
+coverage
+playwright-report
+test-results
+
+# Docs and governance (not needed at runtime)
+docs
+references
+.openspec
+hooks
+scripts
+
+# Dev config files — not needed in the image
+.devcontainer
+*.local
