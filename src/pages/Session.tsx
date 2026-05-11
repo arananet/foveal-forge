@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { getBaseline, listSessions, putSession } from '../storage/db'
 import { PROTOCOL_VERSION, MIN_SESSION_GAP_MS } from '../lib/constants'
+import { primeAudio } from '../lib/sounds'
 import FixationDrill from '../drills/fixation'
 import GaborDrill from '../drills/gabor'
 import SaccadeDrill from '../drills/saccade'
@@ -67,6 +68,7 @@ export default function Session() {
   }, [])
 
   const startSession = useCallback(() => {
+    primeAudio() // unlock AudioContext on mobile before first drill
     sessionIdRef.current = generateSessionId()
     startedAtRef.current = Date.now()
     gaborRef.current = null

@@ -1,5 +1,6 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useTimer } from '../lib/useTimer'
+import { playTick, playFinalTick } from '../lib/sounds'
 
 interface Props {
   durationMs: number
@@ -11,6 +12,16 @@ export default function RestInterval({ durationMs, label, onComplete }: Props) {
   const handleExpire = useCallback(() => onComplete(), [onComplete])
   const { remainingSeconds } = useTimer(durationMs, handleExpire)
 
+  // Countdown ticks for last 10 seconds
+  useEffect(() => {
+    if (remainingSeconds <= 0) return
+    if (remainingSeconds === 1) {
+      playFinalTick()
+    } else if (remainingSeconds <= 10) {
+      playTick()
+    }
+  }, [remainingSeconds])
+
   return (
     <div className="flex flex-col items-center gap-8 py-16">
       <p className="text-sm font-medium uppercase tracking-widest text-indigo-600">{label}</p>
@@ -19,7 +30,8 @@ export default function RestInterval({ durationMs, label, onComplete }: Props) {
       <div className="flex flex-col items-center gap-4 rounded-2xl border border-slate-200 bg-white px-10 py-8 shadow-sm">
         <p className="text-center text-slate-600">
           Look at something at least{' '}
-          <strong className="text-slate-900">6 metres away</strong> for the next {Math.round(durationMs / 1000)} seconds.
+          <strong className="text-slate-900">6 metres away</strong> for the next{' '}
+          {Math.round(durationMs / 1000)} seconds.
         </p>
         <p className="text-center text-sm text-slate-500">
           This is the 20-20-20 rule: every 20 minutes, look 20 feet away for 20 seconds.

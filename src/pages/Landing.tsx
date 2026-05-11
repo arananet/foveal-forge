@@ -101,6 +101,13 @@ export default function Landing() {
           </p>
         </div>
       </section>
+
+      <footer className="mt-12 border-t border-slate-200 pt-6 text-center">
+        <p className="text-sm text-slate-400">
+          Foveal Forge · pre-alpha ·{' '}
+          <span className="text-slate-500">Developer: Eduardo Arana</span>
+        </p>
+      </footer>
     </main>
   )
 }

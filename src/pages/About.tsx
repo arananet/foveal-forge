@@ -98,6 +98,9 @@ export default function About() {
             Source on GitHub
           </a>
         </p>
+        <p className="mt-1 text-sm text-slate-500">
+          <strong className="text-slate-700">Developer:</strong> Eduardo Arana
+        </p>
       </div>
     </main>
   )
